@@ -25,7 +25,7 @@ git init
 git add .
 git commit -m "versión inicial sistema tickets"
 git branch -M main
-git remote add origin https://github.com/GaelRamirezConde/sistematickets.git
+git remote add origin gaelramirezconde.github.io
 git push -u origin main
 
 css
