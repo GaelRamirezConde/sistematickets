@@ -1,0 +1,18 @@
+.ticket-card { 
+    border-left: 6px solid gray;
+}
+
+.prioridad-alta {
+    border-left-color: red;
+    background-color: #ffe6e6;
+}
+
+.prioridad-normal {
+    border-left-color: orange;
+}
+
+.prioridad-baja {
+    border-left-color: green;
+}
+
+.leido { opacity: 0.5; }
