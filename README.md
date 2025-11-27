@@ -25,7 +25,7 @@ git init
 git add .
 git commit -m "versión inicial sistema tickets"
 git branch -M main
-git remote add origin https://github.com/GaelRamirezConde/sistematickets.git
+git remote add origin gaelramirezconde.github.io
 git push -u origin main
 
 css
@@ -34,4 +34,4 @@ Copiar código
 Activar Pages → Deploy from main → root
 
 URL final:
-https://github.com/GaelRamirezConde/sistematickets.git
+https://gaelramirezconde.github.io/sistematickets/

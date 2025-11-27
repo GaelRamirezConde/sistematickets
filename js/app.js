@@ -37,10 +37,10 @@ renderTickets();
 document.getElementById("ticketForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const nombre = name.value.trim();
-    const email = email.value.trim();
-    const texto = message.value.trim();
-    const prioridad = priority.value;
+    const nombre = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const texto = document.getElementById("message").value.trim();
+    const prioridad = document.getElementById("priority").value;
 
     // VALIDACIONES
     if(nombre.length < 3) return showError("Nombre mínimo 3 caracteres.");
