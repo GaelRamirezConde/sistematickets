@@ -1,101 +1,93 @@
-class Message {
-    constructor(nombre, email, texto, prioridad) {
-        this.nombre = nombre;
-        this.email = email;
-        this.texto = texto;
-        this.prioridad = prioridad;
-        this.fecha = new Date().toLocaleString();
-        this.leido = false;
-    }
+// Cargar tickets al abrir la página
+document.addEventListener("DOMContentLoaded", () => {
+    mostrarTickets();
+});
 
-    toHTML(index) {
-        let clasePrioridad = "";
-
-        // SWITCH utilizado (validación requerida por la práctica)
-        switch(this.prioridad){
-            case "alta": clasePrioridad = "prioridad-alta"; break;
-            case "normal": clasePrioridad = "prioridad-normal"; break;
-            case "baja": clasePrioridad = "prioridad-baja"; break;
-        }
-
-        return `
-        <div class="card p-3 mb-2 ticket-card ${clasePrioridad} ${this.leido ? 'leido' : ''}">
-            <strong>${this.nombre}</strong> — ${this.email} <br>
-            <small>${this.fecha}</small>
-            <p>${this.texto}</p>
-            
-            <button onclick="toggleRead(${index})" class="btn btn-outline-info btn-sm">Leído</button>
-            <button onclick="deleteTicket(${index})" class="btn btn-outline-danger btn-sm">Eliminar</button>
-        </div>`;
-    }
+// Guardar ticket en LocalStorage
+function guardarTicket(ticket) {
+    const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    tickets.unshift(ticket); // agrega arriba como chat real
+    localStorage.setItem("tickets", JSON.stringify(tickets));
 }
 
-let tickets = JSON.parse(localStorage.getItem("tickets")) || [];
-renderTickets();
+// Mostrar tickets guardados
+function mostrarTickets() {
+    const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    const lista = document.getElementById("ticketList");
+    lista.innerHTML = "";
 
-// FORMULARIO
-document.getElementById("ticketForm").addEventListener("submit", e => {
+    tickets.forEach((ticket, index) => {
+        agregarTicketHTML(ticket, index);
+    });
+
+    actualizarUrgentes();
+}
+
+// Imprimir ticket en pantalla
+function agregarTicketHTML(ticket, index) {
+    const lista = document.getElementById("ticketList");
+
+    const item = document.createElement("div");
+    item.className = `card p-3 mb-2 border border-dark`;
+
+    item.innerHTML = `
+        <strong>${ticket.nombre}</strong> — ${ticket.email}<br>
+        <small>${ticket.fecha}</small>
+        <p>${ticket.texto}</p>
+        <span class="badge bg-${ticket.prioridad === "alta" ? "danger" : ticket.prioridad === "normal" ? "warning" : "success"}">
+            ${ticket.prioridad.toUpperCase()}
+        </span><br>
+        <button class="btn btn-danger btn-sm" onclick="eliminarTicket(${index})">Eliminar</button>
+    `;
+
+    lista.appendChild(item);
+}
+
+// Captura del formulario
+document.getElementById("ticketForm").addEventListener("submit", (e) => {
     e.preventDefault();
 
     const nombre = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const texto = document.getElementById("message").value.trim();
     const prioridad = document.getElementById("priority").value;
+    const fecha = new Date().toLocaleString();
 
-    // VALIDACIONES
-    if(nombre.length < 3) return showError("Nombre mínimo 3 caracteres.");
-    if(!email.includes("@")) return showError("Email no válido.");
-    if(texto.length < 10) return showError("Mensaje mínimo 10 caracteres.");
+    const ticket = { nombre, email, texto, prioridad, fecha };
 
-    const nuevo = new Message(nombre, email, texto, prioridad);
-    tickets.unshift(nuevo);
-
-    saveData();
-    renderTickets();
+    guardarTicket(ticket);
+    mostrarTickets();
     e.target.reset();
 });
 
-// RENDERIZAR TICKETS
-function renderTickets(filtro = "todos"){
-    ticketList.innerHTML = "";
+// Filtro de ticket
+function filterTickets(filtro) {
+    const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    const lista = document.getElementById("ticketList");
+    lista.innerHTML = "";
 
-    tickets.forEach((t, i) => {
-        if(filtro !== "todos" && t.prioridad !== filtro) return;
-        ticketList.innerHTML += t.toHTML(i);
+    let filtrados = tickets;
+
+    if (filtro !== "todos") {
+        filtrados = tickets.filter(t => t.prioridad === filtro);
+    }
+
+    filtrados.forEach((ticket, index) => {
+        agregarTicketHTML(ticket, index);
     });
-
-    updateUrgentCounter();
 }
 
-// CONTADOR DE ALTA PRIORIDAD
-function updateUrgentCounter(){
-    const urgentes = tickets.filter(t => t.prioridad === "alta").length;
-    countUrgent.textContent = urgentes;
-}
-
-// FUNCIONALIDADES
-function deleteTicket(i){
-    tickets.splice(i,1);
-    saveData();
-    renderTickets();
-}
-
-function toggleRead(i){
-    tickets[i].leido = !tickets[i].leido;
-    saveData();
-    renderTickets();
-}
-
-function filterTickets(pr){
-    renderTickets(pr);
-}
-
-// UTIL
-function showError(msg){
-    errorMsg.textContent = msg;
-    setTimeout(()=> errorMsg.textContent="", 3000);
-}
-
-function saveData(){
+// Eliminar ticket
+function eliminarTicket(index) {
+    const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    tickets.splice(index, 1);
     localStorage.setItem("tickets", JSON.stringify(tickets));
+    mostrarTickets();
+}
+
+// Contador de urgentes (alta prioridad)
+function actualizarUrgentes() {
+    const tickets = JSON.parse(localStorage.getItem("tickets")) || [];
+    const urgentes = tickets.filter(t => t.prioridad === "alta").length;
+    document.getElementById("countUrgent").textContent = urgentes;
 }
